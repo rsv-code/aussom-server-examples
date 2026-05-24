@@ -1,0 +1,333 @@
+<!--
+    Copyright 2026 Austin Lehman
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{appName}}</title>
+    <link rel="stylesheet" href="css/hogan.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f5;
+        }
+        .navbar {
+            background: #000;
+            width: 100%;
+            padding: 1rem 2rem;
+        }
+        .navbar h1 {
+            color: #fff;
+            margin: 0;
+            text-align: left;
+            font-size: 1.5rem;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .hero {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+        .hero img {
+            max-width: 100%;
+            height: auto;
+            display: block;
+        }
+        .info {
+            background: #fff;
+            border-left: 4px solid #000;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            color: #333;
+        }
+        .info h2 {
+            margin: 0 0 0.75rem 0;
+            color: #000;
+            font-size: 1.35rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        .info a {
+            color: #b8860b;
+            text-decoration: none;
+        }
+        .info a:hover {
+            text-decoration: underline;
+        }
+        .endpoint {
+            margin: 1.25rem 0;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .endpoint:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .method {
+            background: #2e7d32;
+            color: #fff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+        }
+        .path {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.95rem;
+            color: #000;
+            font-weight: 600;
+        }
+        .endpoint p {
+            margin: 0.5rem 0;
+        }
+        .endpoint .returns {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .endpoint pre {
+            background: #1e1e1e;
+            color: #e6e6e6;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            margin: 0.5rem 0 0 0;
+        }
+        .endpoint code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+        }
+        .grid img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        @media (max-width: 480px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>Hogan's Hereos API</h1>
+    </nav>
+    <main class="main-container">
+        <div class="info">
+            <h2>About:</h2>
+            Welcome to the Hogan's Heroes fan page API! This API provides a variety of API endpoints about
+            the great Hogan's Heroes show. Images are public domain from <a href="https://commons.wikimedia.org/w/index.php?search=hogans+heroes&title=Special%3AMediaSearch&type=image" target="_blank">CBS Television, Public domain, via Wikimedia Commons</a>.
+            You win some, you lose some.<br />
+            <br />
+            Definition: <a href="./api">Generated OAS Specification for Hogan API</a><br />
+            Bruno API Client File: <a href="./hogan-api-endpoints.yml">hogan-api-endpoints.yml</a>
+        </div>
+        <div class="hero">
+            <img src="img/Werner_Klemperer_Bob_Crane_Hogan's_Heroes_1965.jpeg" alt="Werner Klemperer and Bob Crane, Hogan's Heroes 1965">
+        </div>
+        <div class="info">
+            <h2>Endpoint Info:</h2>
+            <p>All endpoints return <code>application/json</code> unless noted.</p>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/</span>
+                </div>
+                <p>HTML landing page (this page). Rendered with Handlebars from <code>app_data/templates/index.html</code>.</p>
+                <p class="returns"><strong>Returns:</strong> <code>text/html</code></p>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/show</span>
+                </div>
+                <p>Top-level facts about the show: title, network, dates, episode/season counts, setting, studio, and premise.</p>
+                <p class="returns"><strong>Returns:</strong> a JSON object of show-level metadata.</p>
+<pre><code>{
+  "title": "Hogan's Heroes",
+  "network": "CBS",
+  "country": "United States",
+  "genre": "Military sitcom / war comedy",
+  "createdBy": ["Bernard Fein", "Albert S. Ruddy"],
+  "premiereDate": "1965-09-17",
+  "finaleDate": "1971-04-04",
+  "seasons": 6,
+  "episodes": 168,
+  "runtimeMinutes": 30,
+  "setting": "...",
+  "premise": "...",
+  "studio": "...",
+  "pilotFormat": "...",
+  "firstSeasonRanking": "..."
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/themesong</span>
+                </div>
+                <p>Credits and trivia for the show's theme music, the Hogan's Heroes March by Jerry Fielding.</p>
+                <p class="returns"><strong>Returns:</strong> a JSON object describing the theme song.</p>
+<pre><code>{
+  "title": "Hogan's Heroes March",
+  "composer": "Jerry Fielding",
+  "style": "Military march",
+  "drumRiffPerformer": "Bob Crane (a former professional drummer)",
+  "lyricalVersion": "..."
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/characters</span>
+                </div>
+                <p>Principal and recurring characters together with the actors who played them, their ranks, nationalities, and roles.</p>
+                <p class="returns"><strong>Returns:</strong> a JSON array of character objects.</p>
+<pre><code>[
+  {
+    "name": "Col. Robert E. Hogan",
+    "actor": "Bob Crane",
+    "rank": "Colonel",
+    "nationality": "American (U.S. Army Air Forces)",
+    "role": "Senior POW officer; mastermind of the sabotage operation..."
+  },
+  ...
+]</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/quotes</span>
+                </div>
+                <p>Memorable quotes from the series, each tagged with the speaker.</p>
+                <p class="returns"><strong>Returns:</strong> a JSON array of quote objects with <code>speaker</code> and <code>quote</code> keys.</p>
+<pre><code>[
+  {
+    "speaker": "Sgt. Schultz",
+    "quote": "I know nothing! I see nothing! I hear nothing!"
+  },
+  ...
+]</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/castreallifetrivia</span>
+                </div>
+                <p>Real-life facts about the cast (wartime histories, backgrounds, post-show careers).</p>
+                <p class="returns"><strong>Returns:</strong> a JSON array of trivia strings.</p>
+<pre><code>[
+  "Werner Klemperer (Klink) was the son of legendary conductor Otto Klemperer...",
+  "Robert Clary (LeBeau) was a Holocaust survivor...",
+  ...
+]</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/productiontrivia</span>
+                </div>
+                <p>Production-side trivia: creators, network, awards, sets, and post-show history.</p>
+                <p class="returns"><strong>Returns:</strong> a JSON array of trivia strings.</p>
+<pre><code>[
+  "Created by Bernard Fein and Albert S. Ruddy...",
+  "168 episodes were produced across six seasons (1965-1971)...",
+  ...
+]</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/funfacts</span>
+                </div>
+                <p>Lighter in-universe and behind-the-scenes oddities that don't fit the production-trivia bucket.</p>
+                <p class="returns"><strong>Returns:</strong> a JSON array of trivia strings.</p>
+<pre><code>[
+  "Stalag 13 in the show is named after the real Stalag XIII-C near Hammelburg...",
+  "Werner Klemperer's iconic monocle was worn over his actual prescription lens.",
+  ...
+]</code></pre>
+            </div>
+        </div>
+        <div class="grid">
+            <img src="img/Bernard_Fox_Werner_Klemperer_Hogan's_Heroes_1968.jpeg" alt="Bernard Fox and Werner Klemperer, Hogan's Heroes 1968">
+            <img src="img/Bob_Crane_Colonel_Hogan_1969.jpeg" alt="Bob Crane as Colonel Hogan, 1969">
+            <img src="img/Bob_Crane_Elisa_Ingram_Hogan's_Heroes_1967.jpeg" alt="Bob Crane and Elisa Ingram, Hogan's Heroes 1967">
+            <img src="img/Bob_Crane_Hans_Conried_Hogans_Heroes_1966.jpeg" alt="Bob Crane and Hans Conried, Hogan's Heroes 1966">
+            <img src="img/Bob_Crane_John_Banner_Hogan's_Heroes_1966.jpeg" alt="Bob Crane and John Banner, Hogan's Heroes 1966">
+            <img src="img/Bob_Crane_Sigrid_Valdis_Hogans_Heroes_1969.jpeg" alt="Bob Crane and Sigrid Valdis, Hogan's Heroes 1969">
+            <img src="img/Colonel_Hogan_Bob_Crane_Hogan's_Heroes.jpeg" alt="Colonel Hogan, Bob Crane, Hogan's Heroes">
+            <img src="img/Cynthia_Lynn_Bob_Crane_Hogans_Heroes.jpeg" alt="Cynthia Lynn and Bob Crane, Hogan's Heroes">
+            <img src="img/Cynthia_Lynn_Hogans_Heroes.jpeg" alt="Cynthia Lynn, Hogan's Heroes">
+            <img src="img/Hogan_and_Kinchloe.jpeg" alt="Hogan and Kinchloe">
+            <img src="img/hogan-and-klink.jpeg" alt="Hogan and Klink">
+            <img src="img/Hogans_heroes.jpeg" alt="Hogan's Heroes">
+            <img src="img/John_Banner_Bob_Crane_Hogan's_Heroes_1965.jpeg" alt="John Banner and Bob Crane, Hogan's Heroes 1965">
+            <img src="img/John_Banner_in_1965.jpeg" alt="John Banner in 1965">
+            <img src="img/Richard_Dawson_and_Ulla_Stromstedt_in_Hogan's_Heroes_-_1968.jpeg" alt="Richard Dawson and Ulla Stromstedt in Hogan's Heroes, 1968">
+            <img src="img/Richard_Dawson_Hogan_Hero_headshot_1968.png" alt="Richard Dawson Hogan's Heroes headshot, 1968">
+            <img src="img/Robert_Clary_Cynthia_Lynn_Hogans_Heroes.jpeg" alt="Robert Clary and Cynthia Lynn, Hogan's Heroes">
+            <img src="img/Sigrid_Valdis_Hogans_Heroes_1969_(cropped).jpeg" alt="Sigrid Valdis, Hogan's Heroes 1969">
+            <img src="img/Werner_Klemperer_Bob_Crane_Hogan's_Heroes.jpeg" alt="Werner Klemperer and Bob Crane, Hogan's Heroes">
+            <img src="img/Werner_Klemperer_in_1965_Hogan's_Heroes.jpeg" alt="Werner Klemperer in 1965, Hogan's Heroes">
+        </div>
+    </main>
+</body>
+</html>

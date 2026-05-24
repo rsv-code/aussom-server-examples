@@ -1,0 +1,8 @@
+name: hogans_heroes
+version: 1.0.0
+description: "Package hogans_heroes is a package containing all possible Hogan's Heroes trivia I can find."
+license: "Apache-2.0"
+author: "Austin Lehman"
+authorEmail: "cupofcode@yahoo.com"
+type: pure
+dependencies: {}

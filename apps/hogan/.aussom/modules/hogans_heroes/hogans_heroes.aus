@@ -1,0 +1,289 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+/**
+ * Trivia archive for the CBS sitcom Hogan's Heroes (1965-1971).
+ *
+ * Holds show metadata, cast/character data, famous quotes, cast
+ * real-life trivia, production notes, and assorted fun facts as
+ * private member variables. Access each set through its getter.
+ */
+static class hogans_heroes {
+
+	/**
+	 * Top-level facts about the show itself: title, network,
+	 * air dates, episode and season counts, setting, studio,
+	 * and premise.
+	 */
+	private show = {
+		"title": "Hogan's Heroes",
+		"network": "CBS",
+		"country": "United States",
+		"genre": "Military sitcom / war comedy",
+		"createdBy": ["Bernard Fein", "Albert S. Ruddy"],
+		"premiereDate": "1965-09-17",
+		"finaleDate": "1971-04-04",
+		"seasons": 6,
+		"episodes": 168,
+		"runtimeMinutes": 30,
+		"setting": "Luft Stalag 13, a fictional Luftwaffe POW camp near Hammelburg, Germany during World War II",
+		"premise": "Allied prisoners of war secretly run a sabotage and espionage operation out of the very POW camp that imprisons them, all while the bumbling German staff remain oblivious.",
+		"studio": "Desilu Studios (interiors); 40 Acres backlot in Culver City, California (exteriors)",
+		"pilotFormat": "The pilot episode was filmed in black-and-white; the series itself aired in color.",
+		"firstSeasonRanking": "Top 10 Nielsen show in its first season"
+	};
+
+	/**
+	 * Credits and trivia for the show's theme music, the
+	 * Hogan's Heroes March by Jerry Fielding.
+	 */
+	private themeSong = {
+		"title": "Hogan's Heroes March",
+		"composer": "Jerry Fielding",
+		"style": "Military march",
+		"drumRiffPerformer": "Bob Crane (a former professional drummer)",
+		"lyricalVersion": "Jerry Fielding wrote lyrics for the album 'Hogan's Heroes Sing The Best of World War II' (1966), performed by Dixon, Clary, Dawson, and Hovis."
+	};
+
+	/**
+	 * Principal and recurring characters together with the
+	 * actors who played them, their ranks, nationalities,
+	 * and their role in the series.
+	 */
+	private characters = [
+		{
+			"name": "Col. Robert E. Hogan",
+			"actor": "Bob Crane",
+			"rank": "Colonel",
+			"nationality": "American (U.S. Army Air Forces)",
+			"role": "Senior POW officer; mastermind of the sabotage operation run from beneath Stalag 13."
+		},
+		{
+			"name": "Col. Wilhelm Klink",
+			"actor": "Werner Klemperer",
+			"rank": "Oberst (Colonel)",
+			"nationality": "German (Luftwaffe)",
+			"role": "Vain, incompetent Kommandant of Stalag 13 — the unwitting front for Hogan's operation. Famous for snapping 'Dis-missed!'"
+		},
+		{
+			"name": "Sgt. Hans Schultz",
+			"actor": "John Banner",
+			"rank": "Feldwebel (Sergeant)",
+			"nationality": "German",
+			"role": "Lovable, oversized guard whose policy of willful blindness ('I see nothing! I know nothing!') keeps the operation safe."
+		},
+		{
+			"name": "Cpl. Louis LeBeau",
+			"actor": "Robert Clary",
+			"rank": "Corporal",
+			"nationality": "French (Free French Forces)",
+			"role": "Resident chef, tailor, and explosives helper; charms Klink and visiting officers with his cooking."
+		},
+		{
+			"name": "Cpl. Peter Newkirk",
+			"actor": "Richard Dawson",
+			"rank": "Corporal",
+			"nationality": "British (Royal Air Force)",
+			"role": "Con man, magician, pickpocket, card sharp, forger, bookie, tailor, lock picker, and safe cracker."
+		},
+		{
+			"name": "Sgt. James 'Kinch' Kinchloe",
+			"actor": "Ivan Dixon",
+			"rank": "Staff Sergeant",
+			"nationality": "American",
+			"role": "Radio operator and Hogan's second-in-command; the team's link to the underground (seasons 1-5)."
+		},
+		{
+			"name": "Sgt. Andrew Carter",
+			"actor": "Larry Hovis",
+			"rank": "Sergeant",
+			"nationality": "American",
+			"role": "Demolitions expert and impressionist; frequently impersonates German officers, including Hitler."
+		},
+		{
+			"name": "Sgt. Richard Baker",
+			"actor": "Kenneth Washington",
+			"rank": "Sergeant",
+			"nationality": "American",
+			"role": "Replaced Kinchloe as the radio operator in season 6."
+		},
+		{
+			"name": "Gen. Albert Burkhalter",
+			"actor": "Leon Askin",
+			"rank": "General der Infanterie",
+			"nationality": "German",
+			"role": "Klink's exasperated Luftwaffe superior; constantly threatens Klink with the Russian Front."
+		},
+		{
+			"name": "Maj. Wolfgang Hochstetter",
+			"actor": "Howard Caine",
+			"rank": "Major",
+			"nationality": "German (Gestapo)",
+			"role": "Hot-tempered Gestapo officer who suspects Hogan but can never prove anything."
+		},
+		{
+			"name": "Helga",
+			"actor": "Cynthia Lynn",
+			"rank": "Civilian secretary",
+			"nationality": "German",
+			"role": "Klink's secretary in season 1; informant and flirtation for Hogan."
+		},
+		{
+			"name": "Hilda",
+			"actor": "Sigrid Valdis",
+			"rank": "Civilian secretary",
+			"nationality": "German",
+			"role": "Replaced Helga as Klink's secretary from season 2 onward; later married Bob Crane in real life."
+		}
+	];
+
+	/**
+	 * Memorable lines pulled from the series, each tagged
+	 * with the speaker.
+	 */
+	private quotes = [
+		{ "speaker": "Sgt. Schultz",     "quote": "I know nothing! I see nothing! I hear nothing!" },
+		{ "speaker": "Sgt. Schultz",     "quote": "I was not here! I did not even get up this morning!" },
+		{ "speaker": "Sgt. Schultz",     "quote": "Oh, I see nothing — I was not even here, I did not even get up this morning." },
+		{ "speaker": "Col. Klink",       "quote": "Dis-missed!" },
+		{ "speaker": "Col. Klink",       "quote": "Tell me, Schultz, which colonel is running this camp, Hogan or me?" },
+		{ "speaker": "Col. Klink",       "quote": "Hogan, I'm going to have you shot and no court martial will convict me." },
+		{ "speaker": "Col. Klink",       "quote": "Those prisoners will be released over my dead body!" },
+		{ "speaker": "Col. Hogan",       "quote": "It's a deal!" },
+		{ "speaker": "Col. Hogan",       "quote": "Look, I got the idea of stealing it, right? The rest is detail." },
+		{ "speaker": "Col. Hogan",       "quote": "We're the only motel for miles around." },
+		{ "speaker": "Col. Hogan",       "quote": "Colonel, don't you ever think about anything but dames? ... Of course I do, but I fight it." },
+		{ "speaker": "Cpl. LeBeau",      "quote": "Ask me to dig a tunnel, yes. To climb a barbed wire, yes. But to make a pizza, no." },
+		{ "speaker": "Col. Hogan",       "quote": "We all have to make sacrifices." },
+		{ "speaker": "Gen. Burkhalter",  "quote": "Klink! Shut up and listen." },
+		{ "speaker": "Gen. Burkhalter",  "quote": "Be careful you don't suggest yourself to the Russian Front!" },
+		{ "speaker": "Gen. Burkhalter",  "quote": "Disloyalty? No. Stupidity, yes." },
+		{ "speaker": "Maj. Hochstetter", "quote": "The SS has no friends." },
+		{ "speaker": "Sgt. Schultz",     "quote": "They might give me 10 days leave — I would have to spend it with my wife." },
+		{ "speaker": "Klink to Schultz", "quote": "You will speak only when you're spoken to. — 'You spoke to me, Herr Kommandant.' — Next time, don't answer." }
+	];
+
+	/**
+	 * Real-life facts about the cast.
+	 */
+	private castRealLifeTrivia = [
+		"Werner Klemperer (Klink) was the son of legendary conductor Otto Klemperer. The Jewish Klemperer family fled Nazi Germany in 1933 and Werner later served in the U.S. Army during World War II.",
+		"Klemperer accepted the role of Klink only on the condition that the Nazi colonel would always be portrayed as a fool, never as a competent or sympathetic Nazi.",
+		"John Banner (Schultz) was an Austrian Jew who fled the Anschluss in 1938; many of his relatives were killed in the Holocaust. He served as a sergeant in the U.S. Army Air Forces during WWII.",
+		"Robert Clary (LeBeau) was a Holocaust survivor who spent more than two years in Nazi concentration camps, including Buchenwald, with the tattooed prisoner number A-5714.",
+		"Leon Askin (Gen. Burkhalter) escaped Nazi-occupied France via an internment camp; his parents were murdered at Treblinka.",
+		"Howard Caine (Maj. Hochstetter) was Jewish and a U.S. Navy WWII veteran.",
+		"Four of the principal Nazi roles — Klink, Schultz, Burkhalter, and Hochstetter — were played by Jewish actors, three of whom had personally fled or survived the Nazi regime.",
+		"Bob Crane (Hogan) was an established radio DJ and drummer before being cast; he played the show's signature snare-drum opening himself.",
+		"Richard Dawson (Newkirk), an Englishman, later became famous as the original host of the U.S. game show Family Feud.",
+		"Ivan Dixon (Kinchloe) left the show after season 5 to pursue directing; he became a prolific television director."
+	];
+
+	/**
+	 * Production-side trivia: creators, network, awards, set
+	 * details, and post-show history.
+	 */
+	private productionTrivia = [
+		"Created by Bernard Fein and Albert S. Ruddy; Ruddy went on to win an Academy Award for producing The Godfather (1972).",
+		"The pilot, originally pitched with the prisoners in a U.S. military prison, was reworked into a POW-camp setting after CBS bought it.",
+		"168 episodes were produced across six seasons (1965-1971) — Season 1: 32, Season 2: 30, Season 3: 30, Season 4: 26, Season 5: 26, Season 6: 24.",
+		"Interiors were filmed at Desilu Studios; exteriors used the famous 40 Acres backlot in Culver City, California — the same lot used for Gone With the Wind, The Andy Griffith Show's Mayberry, and the original Batman series.",
+		"The compound, guard towers, and barracks were built specifically for the show on 40 Acres and remained standing until the lot was demolished in 1976.",
+		"Filmed in sunny Southern California but set during German winters, the cast wore heavy coats and pretended to be cold. Snow was simulated with salt early on, then switched to white paint to cut costs.",
+		"The series received 12 Emmy Award nominations, winning two — both for Werner Klemperer as Outstanding Supporting Actor in a Comedy Series (1968 and 1969).",
+		"The show was nominated three times for Outstanding Comedy Series.",
+		"Bob Crane was murdered in Scottsdale, Arizona on June 29, 1978; his unsolved killing inspired the 2002 film 'Auto Focus' starring Greg Kinnear.",
+		"John Banner died on his 63rd birthday in 1973, less than two years after the show ended.",
+		"Reruns aired heavily in West Germany during the late 1990s under the title 'Ein Käfig voller Helden' ('A Cage Full of Heroes')."
+	];
+
+	/**
+	 * Lighter in-universe and behind-the-scenes oddities
+	 * that don't fit the production-trivia bucket.
+	 */
+	private funFacts = [
+		"Stalag 13 in the show is named after the real Stalag XIII-C near Hammelburg, although the series' camp is fictional.",
+		"Hogan's prisoners had an underground complex containing a darkroom, tailor shop, machine shop, kitchen, dog kennel, and at least a dozen tunnels — yet Klink never once discovered any of it.",
+		"The bulldog mascot 'Heidi' on the German guards' watchtowers was actually trained to lick rather than bite the prisoners.",
+		"Werner Klemperer's iconic monocle was worn over his actual prescription lens.",
+		"The Hogan's Heroes March was later released as concert-band sheet music and is still a staple of high-school marching bands.",
+		"Several real wartime aircraft (a B-17 nose section, Messerschmitt props) were rented for the show from local aviation collectors.",
+		"Hogan's coffee pot was also a hidden microphone — a recurring gag where the prisoners eavesdropped on Klink's office.",
+		"The show was sold to over 30 international markets but was never broadcast in Israel.",
+		"Robert Clary, fluent in French, often ad-libbed his French dialogue.",
+		"Bob Crane and Sigrid Valdis (Hilda) were married on the set of Hogan's Heroes in October 1970, between scenes."
+	];
+
+	/**
+	 * Returns top-level facts about the show: title, network,
+	 * dates, episode/season counts, setting, studio, and premise.
+	 * @r A map of show-level metadata.
+	 */
+	public getShow() {
+		return hogans_heroes.show;
+	}
+
+	/**
+	 * Returns credits and trivia for the show's theme music.
+	 * @r A map describing the Hogan's Heroes March.
+	 */
+	public getThemeSong() {
+		return hogans_heroes.themeSong;
+	}
+
+	/**
+	 * Returns the principal and recurring characters together
+	 * with the actors who played them.
+	 * @r A list of character maps.
+	 */
+	public getCharacters() {
+		return hogans_heroes.characters;
+	}
+
+	/**
+	 * Returns memorable quotes from the series, each tagged
+	 * with the speaker.
+	 * @r A list of quote maps with "speaker" and "quote" keys.
+	 */
+	public getQuotes() {
+		return hogans_heroes.quotes;
+	}
+
+	/**
+	 * Returns real-life facts about the cast.
+	 * @r A list of trivia strings.
+	 */
+	public getCastRealLifeTrivia() {
+		return hogans_heroes.castRealLifeTrivia;
+	}
+
+	/**
+	 * Returns production-side trivia: creators, network, awards,
+	 * sets, and post-show history.
+	 * @r A list of trivia strings.
+	 */
+	public getProductionTrivia() {
+		return hogans_heroes.productionTrivia;
+	}
+
+	/**
+	 * Returns lighter in-universe and behind-the-scenes oddities.
+	 * @r A list of trivia strings.
+	 */
+	public getFunFacts() {
+		return hogans_heroes.funFacts;
+	}
+}

@@ -1,0 +1,165 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+include http;
+include hogans_heroes.hogans_heroes;
+
+/**
+ * Welcome to the Hogan's Heroes fan page API! This API provides a variety of API
+ * endpoints about the great Hogan's Heroes show. You win some, you lose some.
+ */
+@Api(
+    version = "1.0.0",
+    contactName = "Austin Lehman",
+    contactEmail = "cupofcode@yahoo.com",
+    licenseName = "Apache-2.0",
+    licenseIdentifier = "Apache-2.0",
+    licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0"
+)
+@ApiServer(
+    url = "http://localhost:8080/hogan",
+    desc = "Local development server."
+)
+class hogan : AppBase {
+    /**
+     * Counter for number of API hits.
+     */
+    private apiCount = 0;
+
+    public hogan() {
+        c.log("Initializing Hogan's Heroes App!");
+        this.apiCount = 1;
+    }
+
+    /**
+     * GET /hogan/ - HTML landing page.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "HTML landing page rendered from app_data/templates/index.html.")
+    public index(req) {
+        data = { appName: "hogan" };
+
+        hb = new Handlebars();
+        hb.compile("app_data/templates/index");
+        html = hb.apply(data);
+
+        req.putHeader("content-type", "text/html");
+        req.send(html);
+    }
+
+    /**
+     * Returns top-level facts about the show: title, network,
+     * dates, episode/season counts, setting, studio, and premise.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Show-level metadata.", content = "application/json")
+    public show(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getShow().toJson());
+    }
+
+    /**
+     * Returns credits and trivia for the show's theme music.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Theme song credits and trivia.", content = "application/json")
+    public themesong(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getThemeSong().toJson());
+    }
+
+    /**
+     * Returns the principal and recurring characters together
+     * with the actors who played them.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Principal and recurring characters with cast info.", content = "application/json[]")
+    public characters(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getCharacters().toJson());
+    }
+
+    /**
+     * Returns memorable quotes from the series, each tagged
+     * with the speaker.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Memorable quotes tagged with the speaker.", content = "application/json[]")
+    public quotes(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getQuotes().toJson());
+    }
+
+    /**
+     * Returns real-life facts about the cast.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Real-life facts about the cast.", content = "application/json[]")
+    public castreallifetrivia(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getCastRealLifeTrivia().toJson());
+    }
+
+    /**
+     * Returns real-life facts about the cast.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Production-side trivia: creators, network, awards, sets, and post-show history.", content = "application/json[]")
+    public productiontrivia(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getProductionTrivia().toJson());
+    }
+
+    /**
+     * Returns production-side trivia: creators, network, awards,
+     * sets, and post-show history.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Lighter in-universe and behind-the-scenes oddities.", content = "application/json[]")
+    public funfacts(req) {
+        // Increment the hit count.
+        this.apiCount += 1;
+
+        req.putHeader("content-type", "application/json");
+        req.send(hogans_heroes.getFunFacts().toJson());
+    }
+
+    /**
+     * Returns lighter in-universe and behind-the-scenes oddities.
+     */
+    @Scheduled(every = "60m")
+    public rollupCounters() {
+        this.apiCount = 0;
+    }
+}

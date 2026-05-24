@@ -1,0 +1,4 @@
+schema: 1
+packages:
+- name: hogans_heroes
+  version: 1.0.0

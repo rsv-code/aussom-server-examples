@@ -1,0 +1,110 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+/*
+ * Unit tests for the hogan app.
+ *
+ * Run from the project root with:
+ *   ./aussom-server -t tests/hoganTest.aus
+ */
+
+include aunitserver;
+
+@Test(name = "hogan app")
+class hoganTest : AppTest {
+    private app = null;
+
+    /**
+     * Load and instantiate the hogan app once for the suite.
+     * loadApp() is idempotent — repeated calls reuse the parsed
+     * class — so the @Before lifecycle is enough.
+     */
+    @Before
+    public setUp() {
+        this.app = this.loadApp("hogan", "apps/hogan");
+    }
+
+    /**
+     * GET /hogan/hello returns the plain-text sanity reply.
+     */
+    @Test(name = "hello returns 'hello world!'")
+    public helloReturnsPlainText() {
+        req = this.newReq();
+        req.setMethod("GET").setPath("/hogan/hello");
+
+        this.app.hello(req);
+
+        return this.expect(req.getCapturedBody(), "hello world!");
+    }
+
+    /**
+     * GET /hogan/characters sets content-type to application/json.
+     */
+    @Test(name = "characters route advertises JSON content-type")
+    public charactersHasJsonContentType() {
+        req = this.newReq();
+        req.setMethod("GET").setPath("/hogan/characters");
+
+        this.app.characters(req);
+
+        return this.expect(req.getCapturedHeaders()["content-type"], "application/json");
+    }
+
+    /**
+     * GET /hogan/characters returns the full cast list as JSON.
+     * The hogans_heroes module ships 12 principal / recurring
+     * characters; assert the count so an accidental drop in the
+     * data set fails the test.
+     */
+    @Test(name = "characters returns 12 cast entries")
+    public charactersReturnsFullCast() {
+        req = this.newReq();
+        req.setMethod("GET").setPath("/hogan/characters");
+
+        this.app.characters(req);
+
+        body = json.parse(req.getCapturedBody());
+        return this.expect(#body, 12);
+    }
+
+    /**
+     * First entry in the characters list looks structurally right
+     * (the well-known top-of-list role with the expected actor).
+     * Validates that the JSON serialization preserves the field
+     * names the hogans_heroes module declares.
+     */
+    @Test(name = "first character is Col. Hogan / Bob Crane")
+    public firstCharacterShape() {
+        req = this.newReq();
+        req.setMethod("GET").setPath("/hogan/characters");
+
+        this.app.characters(req);
+
+        body = json.parse(req.getCapturedBody());
+        first = body[0];
+        this.expect(first.name, "Col. Robert E. Hogan");
+        return this.expect(first.actor, "Bob Crane");
+    }
+
+    /**
+     * Tests the rollupCounters() function.
+     */
+    @Test(name = "rollupCounters test")
+    public rollupCountersRuns() {
+        this.app.rollupCounters();
+        return true;
+    }
+}
