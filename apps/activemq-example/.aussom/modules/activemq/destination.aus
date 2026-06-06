@@ -1,0 +1,54 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+include activemq.loader;
+
+/**
+ * A queue or topic, including the temporary variants. Instances come
+ * from ActiveMqSession's create methods and from message replyTo /
+ * destination headers - there is no public constructor.
+ */
+extern class ActiveMqDestination : com.lehman.aussom.ActiveMqDestination {
+    /**
+     * Gets the queue or topic name.
+     * @r A string with the destination name.
+     */
+    public extern getName();
+
+    /**
+     * Reports whether this destination is a queue.
+     * @r A bool with true for a queue.
+     */
+    public extern isQueue();
+
+    /**
+     * Reports whether this destination is a topic.
+     * @r A bool with true for a topic.
+     */
+    public extern isTopic();
+
+    /**
+     * Reports whether this destination is temporary.
+     * @r A bool with true for a temporary queue or topic.
+     */
+    public extern isTemporary();
+
+    /**
+     * Deletes a temporary destination. Errors on non-temporary ones.
+     * @r this object
+     */
+    public extern delete();
+}

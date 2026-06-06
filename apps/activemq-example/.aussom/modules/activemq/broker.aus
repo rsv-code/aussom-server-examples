@@ -1,0 +1,145 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+include activemq.loader;
+include file;
+
+/**
+ * Embedded ActiveMQ broker. Runs entirely in memory by default; call
+ * setPersistent(true) and setDataDirectory() to keep messages in a
+ * KahaDB store on disk. Clients in this JVM connect with getVmUrl();
+ * addConnector() opens TCP ports for outside clients.
+ *
+ * If a broker with the same name is already running in this JVM (for
+ * example after an app hot reload), start() attaches to it instead of
+ * starting a second instance, and configuration setters are ignored
+ * with a logged warning. stop() stops the shared instance.
+ */
+extern class ActiveMqBroker : com.lehman.aussom.ActiveMqBroker {
+    /**
+     * Creates a broker with the provided name. The name is also the
+     * vm:// address clients in this JVM use.
+     * @p Name is a string with the broker name.
+     */
+    public ActiveMqBroker(string Name) {
+        this.newBroker(Name);
+        return this;
+    }
+    private extern newBroker(string Name);
+
+    /**
+     * Enables or disables disk persistence (KahaDB). Default false,
+     * meaning the broker runs entirely in memory. With persistence on,
+     * call setDataDirectory() before start().
+     * @p Persistent is a bool with true to write messages to disk.
+     * @r this object
+     */
+    public extern setPersistent(bool Persistent);
+
+    /**
+     * Sets the directory the broker writes its files to. The directory
+     * must be inside the app's app_data directory (for example
+     * 'app_data/activemq'); under Aussom Server the path is resolved
+     * and checked by the server's file rules.
+     * @p Dir is a string with the app_data-relative directory.
+     * @r this object
+     */
+    public setDataDirectory(string Dir) {
+        return this._setDataDirectoryResolved(Dir, file.getAbsPath(Dir));
+    }
+    private extern _setDataDirectoryResolved(string Dir, string AbsPath);
+
+    /**
+     * Enables broker-side scheduled message delivery (used by the
+     * ActiveMqMessage setScheduled* methods). In-memory brokers keep
+     * scheduled jobs in memory; persistent brokers store them under
+     * the data directory.
+     * @p On is a bool with true to enable the scheduler.
+     * @r this object
+     */
+    public extern setSchedulerSupport(bool On);
+
+    /**
+     * Enables or disables advisory topics. Default true, matching
+     * ActiveMQ's own default.
+     * @p On is a bool with true to enable advisory topics.
+     * @r this object
+     */
+    public extern setAdvisorySupport(bool On);
+
+    /**
+     * Caps the broker's message memory usage. 0 leaves the ActiveMQ
+     * default in place.
+     * @p Mb is an int with the memory limit in megabytes.
+     * @r this object
+     */
+    public extern setMemoryLimitMb(int Mb);
+
+    /**
+     * Adds a transport connector opened at start(), for example
+     * 'tcp://127.0.0.1:0' (port 0 picks a free port; read the real
+     * one with getConnectorUrls()). Call before start().
+     * @p Url is a string with the connector URI.
+     * @r this object
+     */
+    public extern addConnector(string Url);
+
+    /**
+     * Starts the broker, or attaches to an already-running broker
+     * with the same name (see class docs).
+     * @r this object
+     */
+    public extern start();
+
+    /**
+     * Stops the broker. Safe to call more than once. This stops the
+     * shared JVM-wide instance, including an attached one.
+     * @r this object
+     */
+    public extern stop();
+
+    /**
+     * Reports whether the broker is running.
+     * @r A bool with true while the broker is started.
+     */
+    public extern isStarted();
+
+    /**
+     * Gets the broker name.
+     * @r A string with the broker name.
+     */
+    public extern getBrokerName();
+
+    /**
+     * Gets the vm:// URL clients in this JVM connect with.
+     * @r A string with the vm:// connection URL.
+     */
+    public extern getVmUrl();
+
+    /**
+     * Reports whether start() attached to an already-running broker
+     * instead of starting a new one.
+     * @r A bool with true when the broker was adopted.
+     */
+    public extern isAdopted();
+
+    /**
+     * Gets the actual bound transport connector URIs. A port 0
+     * connector shows its real port here.
+     * @r A list of strings with the connector URIs.
+     */
+    public extern getConnectorUrls();
+}

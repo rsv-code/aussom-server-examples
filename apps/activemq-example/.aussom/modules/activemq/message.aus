@@ -1,0 +1,257 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+include activemq.loader;
+
+/**
+ * One wrapper for every JMS message type: text, bytes, map, stream,
+ * object, and the body-less base message. Headers and properties are
+ * shared by all types; the body methods error cleanly when called on
+ * the wrong type. Instances come from the ActiveMqSession create*
+ * methods and from receive() - there is no public constructor.
+ */
+extern class ActiveMqMessage : com.lehman.aussom.ActiveMqMessage {
+    /**
+     * Gets this message's type.
+     * @r A string with text, bytes, map, stream, object, or message.
+     */
+    public extern getMessageType();
+
+    /**
+     * Gets the body of a text message.
+     * @r A string with the body, or null when unset.
+     */
+    public extern getText();
+
+    /**
+     * Sets the body of a text message.
+     * @p Text is a string with the body.
+     * @r this object
+     */
+    public extern setText(string Text);
+
+    /**
+     * Appends the contents of a Buffer to a bytes message.
+     * @p Buff is a Buffer object with the bytes to append.
+     * @r this object
+     */
+    public extern writeBytes(object Buff);
+
+    /**
+     * Reads the full body of a bytes message.
+     * @r A Buffer object with the body bytes.
+     */
+    public extern readBytes();
+
+    /**
+     * Sets a named value on a map message. Strings, ints, doubles,
+     * bools, and Buffers are supported.
+     * @p Name is a string with the value name.
+     * @p Value is the value to store.
+     * @r this object
+     */
+    public extern setMapValue(string Name, Value);
+
+    /**
+     * Reads a named value from a map message.
+     * @p Name is a string with the value name.
+     * @r The stored value, or null when the name is missing.
+     */
+    public extern getMapValue(string Name);
+
+    /**
+     * Lists the names present in a map message.
+     * @r A list of strings with the value names.
+     */
+    public extern getMapNames();
+
+    /**
+     * Appends a value to a stream message. Strings, ints, doubles,
+     * bools, and Buffers are supported.
+     * @p Value is the value to append.
+     * @r this object
+     */
+    public extern writeValue(Value);
+
+    /**
+     * Reads the next value from a stream message, starting from the
+     * beginning on a freshly written message.
+     * @r The next value in the stream.
+     */
+    public extern readValue();
+
+    /**
+     * Sets the payload of an object message. Strings, ints, doubles,
+     * bools, lists, and maps convert to serializable Java values.
+     * @p Value is the payload.
+     * @r this object
+     */
+    public extern setObject(Value);
+
+    /**
+     * Reads the payload of an object message. The connection must
+     * trust the payload's packages (setTrustedPackages).
+     * @r The payload value.
+     */
+    public extern getObject();
+
+    /**
+     * Gets the correlation ID used to pair replies with requests.
+     * @r A string with the correlation ID, or null when unset.
+     */
+    public extern getCorrelationId();
+
+    /**
+     * Sets the correlation ID used to pair replies with requests.
+     * @p Id is a string with the correlation ID.
+     * @r this object
+     */
+    public extern setCorrelationId(string Id);
+
+    /**
+     * Gets the destination replies should be sent to.
+     * @r An ActiveMqDestination object, or null when unset.
+     */
+    public extern getReplyTo();
+
+    /**
+     * Sets the destination replies should be sent to.
+     * @p Dest is an ActiveMqDestination object.
+     * @r this object
+     */
+    public extern setReplyTo(object Dest);
+
+    /**
+     * Gets the application-set JMS type header.
+     * @r A string with the type, or null when unset.
+     */
+    public extern getType();
+
+    /**
+     * Sets the application JMS type header.
+     * @p Type is a string with the type.
+     * @r this object
+     */
+    public extern setType(string Type);
+
+    /**
+     * Gets the broker-assigned message ID (set after send).
+     * @r A string with the message ID, or null before send.
+     */
+    public extern getMessageId();
+
+    /**
+     * Gets the send timestamp (set after send).
+     * @r An int with milliseconds since the epoch.
+     */
+    public extern getTimestamp();
+
+    /**
+     * Gets the destination this message was sent to.
+     * @r An ActiveMqDestination object, or null before send.
+     */
+    public extern getDestination();
+
+    /**
+     * Gets this message's delivery mode.
+     * @r A string with persistent or non_persistent.
+     */
+    public extern getDeliveryMode();
+
+    /**
+     * Gets this message's priority.
+     * @r An int from 0 to 9.
+     */
+    public extern getPriority();
+
+    /**
+     * Gets the expiration timestamp.
+     * @r An int with milliseconds since the epoch, 0 for never.
+     */
+    public extern getExpiration();
+
+    /**
+     * Reports whether the broker redelivered this message.
+     * @r A bool with true for a redelivered message.
+     */
+    public extern getRedelivered();
+
+    /**
+     * Sets a typed property. The JMS property type follows the value
+     * type: string, int, double, or bool.
+     * @p Name is a string with the property name.
+     * @p Value is the property value.
+     * @r this object
+     */
+    public extern setProperty(string Name, Value);
+
+    /**
+     * Reads a property by name.
+     * @p Name is a string with the property name.
+     * @r The property value, or null when missing.
+     */
+    public extern getProperty(string Name);
+
+    /**
+     * Lists this message's property names.
+     * @r A list of strings with the property names.
+     */
+    public extern getPropertyNames();
+
+    /**
+     * Reports whether a property exists.
+     * @p Name is a string with the property name.
+     * @r A bool with true when the property exists.
+     */
+    public extern hasProperty(string Name);
+
+    /**
+     * Delays delivery. The broker needs scheduler support enabled.
+     * @p Ms is an int with the delay in milliseconds.
+     * @r this object
+     */
+    public extern setScheduledDelay(int Ms);
+
+    /**
+     * Redelivers every period (with setScheduledRepeat). The broker
+     * needs scheduler support enabled.
+     * @p Ms is an int with the period in milliseconds.
+     * @r this object
+     */
+    public extern setScheduledPeriod(int Ms);
+
+    /**
+     * Sets how many times a periodic delivery repeats.
+     * @p Count is an int with the repeat count.
+     * @r this object
+     */
+    public extern setScheduledRepeat(int Count);
+
+    /**
+     * Schedules delivery with a cron expression. The broker needs
+     * scheduler support enabled.
+     * @p Expr is a string with the cron expression.
+     * @r this object
+     */
+    public extern setScheduledCron(string Expr);
+
+    /**
+     * Acknowledges this message on a client or individual acknowledge
+     * session.
+     * @r this object
+     */
+    public extern ack();
+}

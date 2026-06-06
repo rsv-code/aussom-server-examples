@@ -1,0 +1,274 @@
+<!--
+    Copyright 2026 Austin Lehman
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
+    Unless required by applicable law or agreed to in writing, software
+    distributed under the License is distributed on an "AS IS" BASIS,
+    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+    implied. See the License for the specific language governing
+    permissions and limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{appName}}</title>
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: #f5f5f5;
+        }
+        .navbar {
+            background: #000;
+            width: 100%;
+            padding: 1rem 2rem;
+        }
+        .navbar h1 {
+            color: #fff;
+            margin: 0;
+            text-align: left;
+            font-size: 1.5rem;
+        }
+        .main-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        .info {
+            background: #fff;
+            border-left: 4px solid #000;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 2rem;
+            line-height: 1.6;
+            color: #333;
+        }
+        .info h2 {
+            margin: 0 0 0.75rem 0;
+            color: #000;
+            font-size: 1.35rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.5rem;
+        }
+        .info a {
+            color: #b8860b;
+            text-decoration: none;
+        }
+        .info a:hover {
+            text-decoration: underline;
+        }
+        .flow {
+            margin: 1rem 0;
+            padding: 1rem 1.25rem;
+            background: #fafafa;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .flow ol {
+            margin: 0;
+            padding-left: 1.25rem;
+        }
+        .flow li {
+            margin: 0.4rem 0;
+        }
+        .flow-diagram {
+            background: #1e1e1e;
+            color: #e6e6e6;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            margin: 1rem 0 0 0;
+            white-space: pre;
+        }
+        .endpoint {
+            margin: 1.25rem 0;
+            padding: 1rem;
+            background: #fafafa;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        .endpoint:first-of-type {
+            margin-top: 0.5rem;
+        }
+        .endpoint-header {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            flex-wrap: wrap;
+            margin-bottom: 0.5rem;
+        }
+        .method {
+            background: #2e7d32;
+            color: #fff;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.2rem 0.5rem;
+            border-radius: 3px;
+            letter-spacing: 0.05em;
+        }
+        .path {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+            font-size: 0.95rem;
+            color: #000;
+            font-weight: 600;
+        }
+        .endpoint p {
+            margin: 0.5rem 0;
+        }
+        .endpoint .returns {
+            margin-top: 0.5rem;
+            font-size: 0.9rem;
+            color: #555;
+        }
+        .endpoint pre, .info pre {
+            background: #1e1e1e;
+            color: #e6e6e6;
+            padding: 0.75rem 1rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 0.82rem;
+            line-height: 1.45;
+            margin: 0.5rem 0 0 0;
+        }
+        .endpoint code, .info code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar">
+        <h1>ActiveMQ Example App</h1>
+    </nav>
+    <main class="main-container">
+        <div class="info">
+            <h2>About:</h2>
+            This app is a working round-trip example of the <code>activemq</code> apac module and
+            the Aussom Server <strong>Client Listener</strong> feature. It runs an embedded
+            Apache ActiveMQ broker inside the server's JVM, publishes a made-up order record
+            to a queue when you call an HTTP endpoint, and lets a registered
+            <code>ActiveMqListener</code> pick the message up and process it on a
+            server-managed background thread. You then read the results back over HTTP.<br />
+            <br />
+            Definition: <a href="./api">Generated OAS Specification for the activemqexample API</a>
+        </div>
+
+        <div class="info">
+            <h2>How It Works:</h2>
+            <div class="flow">
+                <ol>
+                    <li>At app start, the constructor starts an embedded in-memory ActiveMQ
+                        broker (<code>vm://activemqexample</code>), opens one shared publisher
+                        connection, and registers an <code>ActiveMqListener</code> on the
+                        <code>orders.example</code> queue with <code>app.registerListener()</code>.
+                        The server runtime owns the listener's thread and lifecycle.</li>
+                    <li><code>GET /activemqexample/publish</code> builds a made-up order record,
+                        opens a short-lived session and producer from the shared connection
+                        (session-per-send, because JMS sessions are not thread-safe), and
+                        sends the record to the queue as a JSON text message.</li>
+                    <li>The listener receives the message on its own thread, parses the JSON
+                        back into a record, computes the order total, marks it processed,
+                        acknowledges the message, and stores the result.</li>
+                    <li><code>GET /activemqexample/status</code> reports the listener's counters
+                        and the processed records, so you can confirm the full round trip.</li>
+                </ol>
+                <div class="flow-diagram">HTTP request                embedded broker              listener thread
+     |                            |                            |
+publish ---> orders.example queue ---> onOrder(msg) ---> processed list
+     |                            |                            |
+status  <----------------- shared app state <------------------+</div>
+            </div>
+            <p>The app also demonstrates the threading discipline a real server app should
+            follow: HTTP handlers write no shared state (order IDs come from
+            <code>uuid.get()</code>), and all counters and records are owned by the single
+            listener thread.</p>
+        </div>
+
+        <div class="info">
+            <h2>Endpoint Info:</h2>
+            <p>All endpoints are GET requests and return <code>application/json</code> unless noted.
+            Try it from a terminal:</p>
+<pre><code>curl http://localhost:8081/activemqexample/publish
+curl http://localhost:8081/activemqexample/status</code></pre>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/</span>
+                </div>
+                <p>HTML landing page (this page). Rendered with Handlebars from
+                <code>app_data/templates/index.html</code>.</p>
+                <p class="returns"><strong>Returns:</strong> <code>text/html</code></p>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/publish</span>
+                </div>
+                <p>Builds a made-up order record and publishes it to the
+                <code>orders.example</code> queue. The client listener picks it up from there.
+                Call it as many times as you like; each call publishes one message.</p>
+                <p class="returns"><strong>Returns:</strong> the published record and the
+                broker-assigned message ID.</p>
+<pre><code>{
+  "published": {
+    "orderId": "ORD-1f0c9a4e-...",
+    "customer": "Sgt. Schultz",
+    "item": "Apple Strudel",
+    "quantity": 12,
+    "unitPrice": 3.5,
+    "status": "new"
+  },
+  "messageId": "ID:hostname-43210-1780724827122-4:1:1:1:1"
+}</code></pre>
+            </div>
+
+            <div class="endpoint">
+                <div class="endpoint-header">
+                    <span class="method">GET</span>
+                    <span class="path">/status</span>
+                </div>
+                <p>Reports what the listener has processed. After a publish, the matching
+                record shows up here with <code>status</code> flipped to
+                <code>processed</code> and a computed <code>total</code> - that is the proof
+                the message went through the broker and the listener handled it. The
+                <code>processed</code> list holds the most recent 25 records.</p>
+                <p class="returns"><strong>Returns:</strong> listener counters and processed records.</p>
+<pre><code>{
+  "processedCount": 1,
+  "errorCount": 0,
+  "lastError": "",
+  "processed": [
+    {
+      "orderId": "ORD-1f0c9a4e-...",
+      "customer": "Sgt. Schultz",
+      "item": "Apple Strudel",
+      "quantity": 12,
+      "unitPrice": 3.5,
+      "status": "processed",
+      "total": 42.0,
+      "brokerTimestamp": 1780724827122
+    }
+  ]
+}</code></pre>
+            </div>
+        </div>
+    </main>
+</body>
+</html>

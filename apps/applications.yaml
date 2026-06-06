@@ -2,3 +2,6 @@ applications:
 - {publicHttpDirectory: public, logLevel: info, name: hogan, reloadOnFileChange: true,
   hostApiEndpoint: true, appDirectory: hogan, hostDocEndpoint: true, enabled: true,
   hostResources: true}
+- {publicHttpDirectory: public, logLevel: info, name: activemqexample, reloadOnFileChange: true,
+  hostApiEndpoint: true, appDirectory: activemq-example, hostDocEndpoint: true, enabled: true,
+  hostResources: true}

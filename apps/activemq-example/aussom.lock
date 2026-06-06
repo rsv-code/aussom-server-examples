@@ -1,0 +1,4 @@
+schema: 1
+packages:
+- name: activemq
+  version: 1.0.0

@@ -1,0 +1,8 @@
+name: activemq
+version: 1.0.0
+description: "Apache ActiveMQ Classic connector. Embedded or remote broker, full JMS-style client API, and an Aussom Server ClientListener."
+license: "Apache-2.0"
+author: "Austin Lehman"
+authorEmail: "cupofcode@yahoo.com"
+type: jvm
+dependencies: {}

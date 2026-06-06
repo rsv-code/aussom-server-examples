@@ -1,0 +1,215 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or
+ * implied. See the License for the specific language governing
+ * permissions and limitations under the License.
+ */
+
+include http;
+include app;
+include util;
+include activemq.activemq;
+
+/**
+ * ActiveMQ client listener example app.
+ *
+ * Round trip demonstrated:
+ *   1. GET /activemqexample/publish builds a made-up order record and
+ *      publishes it as a JSON text message to the orders.example queue
+ *      on an embedded in-memory broker.
+ *   2. The registered ActiveMqListener picks the message up on its
+ *      server-managed thread, parses it, marks it processed, and
+ *      stores it.
+ *   3. GET /activemqexample/status reports the processed count and the
+ *      processed records so the round trip can be verified.
+ *
+ * Threading note: all mutable app state is owned by the listener
+ * thread (single writer); HTTP request threads only read it.
+ */
+@Api(
+    version = "0.0.1",
+    contactName = "Austin Lehman",
+    contactEmail = "cupofcode@yahoo.com",
+    licenseName = "Apache-2.0",
+    licenseIdentifier = "Apache-2.0",
+    licenseUrl = "https://www.apache.org/licenses/LICENSE-2.0"
+)
+@ApiServer(
+    url = "http://localhost:8081/activemqexample",
+    desc = "Local development server."
+)
+class activemqexample : AppBase {
+    /** Embedded in-memory ActiveMQ broker. */
+    private broker = null;
+
+    /**
+     * Publisher-side connection, reused across requests. A JMS
+     * Connection is thread-safe and expensive to build, so one is
+     * shared app-wide. Sessions and producers are NOT thread-safe,
+     * so publish() creates and closes its own per send.
+     */
+    private con = null;
+
+    /**
+     * Counters and processed records for verifying the round trip.
+     * Single-writer discipline: ONLY the listener thread writes
+     * these. Aussom's += is read-compute-write across several eval
+     * steps, so it is not atomic; incrementing from concurrent HTTP
+     * request threads loses updates. HTTP handlers only read here.
+     */
+    private processedCount = 0;
+    private errorCount = 0;
+    private lastError = "";
+    private processed = [];
+
+    public activemqexample() {
+        c.log("Initializing ActiveMQ example app.");
+
+        // Embedded in-memory broker. The vm:// URL keeps the whole
+        // round trip inside this JVM.
+        this.broker = new ActiveMqBroker("activemqexample");
+        this.broker.start();
+
+        // Publisher side: one shared connection kept for the app's
+        // lifetime. The publish endpoint creates its own session and
+        // producer from it on every send.
+        this.con = new ActiveMqConnection(this.broker.getVmUrl());
+        this.con.connect();
+
+        // Consumer side: the ActiveMQ client listener. The server
+        // runtime owns its thread and lifecycle once registered.
+        lst = new ActiveMqListener("orders.example");
+        lst.setBrokerUrl(this.broker.getVmUrl());
+        lst.setQueue("orders.example");
+        lst.setAckMode("individual");
+        lst.setOnMessage(::onOrder);
+        lst.setOnError(::onListenerError);
+        app.registerListener(lst);
+    }
+
+    /**
+     * GET /activemqexample/ - HTML landing page describing the app, the
+     * round trip it demonstrates, and the available endpoints.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "HTML landing page rendered from app_data/templates/index.html.")
+    public index(req) {
+        data = { appName: "activemq-example" };
+
+        hb = new Handlebars();
+        hb.compile("app_data/templates/index");
+        html = hb.apply(data);
+
+        req.putHeader("content-type", "text/html");
+        req.send(html);
+    }
+
+    /**
+     * GET /activemqexample/publish - Builds a made-up order record and
+     * publishes it as a JSON text message to the orders.example queue.
+     * The client listener picks it up from there.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "The published record and its broker message ID.", content = "application/json")
+    public publish(req) {
+        // No shared state is written on the request thread. The
+        // order ID comes from uuid.get() instead of a shared
+        // counter, so concurrent publishes need no coordination.
+        order = {
+            orderId: "ORD-" + uuid.get(),
+            customer: "Sgt. Schultz",
+            item: "Apple Strudel",
+            quantity: 12,
+            unitPrice: 3.5,
+            status: "new"
+        };
+
+        // Session-per-send: HTTP handlers run on a pool of worker
+        // threads and JMS sessions/producers are not thread-safe, so
+        // each publish builds its own from the shared connection and
+        // closes it when done. Under heavy publish load, swap this
+        // for a pool of session/producer pairs instead.
+        sess = this.con.createSession();
+        messageId = "";
+        try {
+            prod = sess.createProducer(sess.createQueue("orders.example"));
+            msg = sess.createTextMessage(order.toJson());
+            prod.send(msg);
+            messageId = msg.getMessageId();
+            sess.close();
+        } catch (e) {
+            // Close on the error path too, otherwise the session
+            // leaks on the shared connection.
+            sess.close();
+            throw "publish failed: " + e;
+        }
+        c.log("Published order '" + order["orderId"] + "' to orders.example (" + messageId + ").");
+
+        ret = {
+            published: order,
+            messageId: messageId
+        };
+        req.putHeader("content-type", "application/json");
+        req.send(ret.toJson());
+    }
+
+    /**
+     * GET /activemqexample/status - Reports the listener's counters and
+     * the records it has processed so far.
+     */
+    @ApiGetReq
+    @ApiGetResp(statusCode = "200", desc = "Processed count and processed records.", content = "application/json")
+    public status(req) {
+        ret = {
+            processedCount: this.processedCount,
+            errorCount: this.errorCount,
+            lastError: this.lastError,
+            processed: this.processed
+        };
+        req.putHeader("content-type", "application/json");
+        req.send(ret.toJson());
+    }
+
+    /**
+     * Message handler for the orders.example client listener. Runs on the
+     * listener's server-managed thread with one ActiveMqMessage
+     * argument. Parses the JSON body back into a record, computes the
+     * order total, marks it processed, and acknowledges the message.
+     */
+    public onOrder(object Msg) {
+        order = json.parse(Msg.getText());
+        order["status"] = "processed";
+        order["total"] = order["quantity"] * order["unitPrice"];
+        order["brokerTimestamp"] = Msg.getTimestamp();
+
+        this.processedCount += 1;
+        this.processed @= order;
+        // Keep only the most recent 25 records.
+        while (this.processed.size() > 25) {
+            this.processed.remove(0);
+        }
+
+        Msg.ack();
+        c.log("Processed order '" + order["orderId"] + "' total=" + order["total"] + ".");
+    }
+
+    /**
+     * Error handler for the orders.example client listener. Called with
+     * the error text when onOrder throws; with individual ack mode the
+     * broker redelivers the message.
+     */
+    public onListenerError(string ErrText) {
+        this.errorCount += 1;
+        this.lastError = ErrText;
+        c.err("orders.example listener handler error: " + ErrText);
+    }
+}

@@ -1,0 +1,185 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+include activemq.loader;
+include activemq.destination;
+include activemq.producer;
+include activemq.consumer;
+include activemq.browser;
+include activemq.message;
+
+/**
+ * A JMS session created from ActiveMqConnection.createSession().
+ * Destinations, producers, consumers, browsers, and messages are all
+ * created here, and transactions commit or roll back here. Use one
+ * session per thread, per the JMS contract.
+ */
+extern class ActiveMqSession : com.lehman.aussom.ActiveMqSession {
+    /**
+     * Gets a queue destination. ActiveMQ wildcard names (orders.>)
+     * and composite names (a,b) are plain strings and work unchanged.
+     * @p Name is a string with the queue name.
+     * @r A new ActiveMqDestination object.
+     */
+    public extern createQueue(string Name);
+
+    /**
+     * Gets a topic destination.
+     * @p Name is a string with the topic name.
+     * @r A new ActiveMqDestination object.
+     */
+    public extern createTopic(string Name);
+
+    /**
+     * Creates a temporary queue that lives as long as the connection.
+     * Useful as a private reply destination for request/reply.
+     * @r A new ActiveMqDestination object.
+     */
+    public extern createTemporaryQueue();
+
+    /**
+     * Creates a temporary topic that lives as long as the connection.
+     * @r A new ActiveMqDestination object.
+     */
+    public extern createTemporaryTopic();
+
+    /**
+     * Creates a producer. With a destination the producer's send()
+     * targets it; with null the producer is anonymous and sendTo()
+     * picks the destination per message.
+     * @p Dest is an ActiveMqDestination object or null (default null).
+     * @r A new ActiveMqProducer object.
+     */
+    public extern createProducer(object Dest = null);
+
+    /**
+     * Creates a consumer on a destination.
+     * @p Dest is an ActiveMqDestination object.
+     * @p Selector is a string with a JMS selector, or null (default null).
+     * @p NoLocal is a bool that skips messages sent on this connection - topics only (default false).
+     * @r A new ActiveMqConsumer object.
+     */
+    public extern createConsumer(object Dest, string Selector = null, bool NoLocal = false);
+
+    /**
+     * Creates a durable topic subscription. The connection needs a
+     * client ID (setClientId) set before connect(). Messages published
+     * while the subscriber is offline wait for it.
+     * @p Topic is an ActiveMqDestination topic object.
+     * @p SubName is a string with the subscription name.
+     * @p Selector is a string with a JMS selector, or null (default null).
+     * @p NoLocal is a bool that skips messages sent on this connection (default false).
+     * @r A new ActiveMqConsumer object.
+     */
+    public extern createDurableSubscriber(object Topic, string SubName, string Selector = null, bool NoLocal = false);
+
+    /**
+     * Removes a durable subscription by name. Close its consumer
+     * first.
+     * @p SubName is a string with the subscription name.
+     * @r this object
+     */
+    public extern unsubscribe(string SubName);
+
+    /**
+     * Creates a browser that walks a snapshot of a queue without
+     * consuming its messages.
+     * @p Queue is an ActiveMqDestination queue object.
+     * @p Selector is a string with a JMS selector, or null (default null).
+     * @r A new ActiveMqBrowser object.
+     */
+    public extern createBrowser(object Queue, string Selector = null);
+
+    /**
+     * Creates a text message.
+     * @p Text is a string with the initial body, or null (default null).
+     * @r A new ActiveMqMessage object.
+     */
+    public extern createTextMessage(string Text = null);
+
+    /**
+     * Creates an empty bytes message. Fill it with writeBytes().
+     * @r A new ActiveMqMessage object.
+     */
+    public extern createBytesMessage();
+
+    /**
+     * Creates an empty map message. Fill it with setMapValue().
+     * @r A new ActiveMqMessage object.
+     */
+    public extern createMapMessage();
+
+    /**
+     * Creates an empty stream message. Fill it with writeValue().
+     * @r A new ActiveMqMessage object.
+     */
+    public extern createStreamMessage();
+
+    /**
+     * Creates an object message. Set the payload with setObject().
+     * Reading the payload back requires trusted packages on the
+     * connection.
+     * @r A new ActiveMqMessage object.
+     */
+    public extern createObjectMessage();
+
+    /**
+     * Creates a body-less message carrying only headers and
+     * properties.
+     * @r A new ActiveMqMessage object.
+     */
+    public extern createMessage();
+
+    /**
+     * Commits all sends and receives since the last commit on a
+     * transacted session.
+     * @r this object
+     */
+    public extern commit();
+
+    /**
+     * Rolls back all sends and receives since the last commit on a
+     * transacted session. Received messages are redelivered.
+     * @r this object
+     */
+    public extern rollback();
+
+    /**
+     * Redelivers messages received but not yet acknowledged on a
+     * client or individual acknowledge session.
+     * @r this object
+     */
+    public extern recover();
+
+    /**
+     * Reports whether this session is transacted.
+     * @r A bool with true for a transacted session.
+     */
+    public extern getTransacted();
+
+    /**
+     * Gets this session's acknowledge mode.
+     * @r A string with auto, client, dups_ok, individual, or transacted.
+     */
+    public extern getAckMode();
+
+    /**
+     * Closes the session and everything created from it. Safe to call
+     * more than once.
+     * @r this object
+     */
+    public extern close();
+}

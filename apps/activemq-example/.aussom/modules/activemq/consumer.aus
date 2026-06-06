@@ -1,0 +1,52 @@
+/*
+ * Copyright 2026 Austin Lehman
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+include activemq.loader;
+
+/**
+ * Pulls messages from a destination. Created with
+ * ActiveMqSession.createConsumer() or createDurableSubscriber().
+ * Consumption here is synchronous (receive); push-style consumption
+ * runs through ActiveMqListener under the Aussom Server listener
+ * runtime.
+ */
+extern class ActiveMqConsumer : com.lehman.aussom.ActiveMqConsumer {
+    /**
+     * Receives the next message, waiting up to TimeoutMs. A timeout
+     * of 0 waits forever.
+     * @p TimeoutMs is an int with the wait in milliseconds (default 0).
+     * @r An ActiveMqMessage object, or null when the timeout expires.
+     */
+    public extern receive(int TimeoutMs = 0);
+
+    /**
+     * Returns the next message only if one is ready right now.
+     * @r An ActiveMqMessage object, or null when none is ready.
+     */
+    public extern receiveNoWait();
+
+    /**
+     * Gets this consumer's JMS selector.
+     * @r A string with the selector, or null when none is set.
+     */
+    public extern getSelector();
+
+    /**
+     * Closes the consumer. Safe to call more than once.
+     * @r this object
+     */
+    public extern close();
+}

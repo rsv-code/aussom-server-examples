@@ -1,0 +1,174 @@
+# file: listener.aus
+
+## class: ActiveMqListener
+
+[37:14] (extern: com.lehman.aussom.ActiveMqListener) **extends: object** 
+
+The Aussom Server ClientListener connector for ActiveMQ. Configure
+it, then hand it to the server with app.registerListener(listener):
+the runtime gives it a dedicated thread, drives its lifecycle
+across reloads and shutdown, and applies the auto-restart policy
+from applications.yaml (keyed by the listener name).
+lst = new ActiveMqListener("orders.created");
+lst.setBrokerUrl(broker.getVmUrl());
+lst.setQueue("orders.created");
+lst.setOnMessage(::onOrder);
+app.registerListener(lst);
+The onMessage handler runs on the listener thread with one
+ActiveMqMessage argument. While the handler runs no new messages
+are pulled, so slow handlers get natural back-pressure.
+
+#### Methods
+
+- **ActiveMqListener** (`string Name`)
+
+	> Creates a listener. The name is the stable identifier used in logs and per-listener overrides in applications.yaml.
+
+	- **@p** `Name` is a string with the listener name.
+
+
+- **newListener** (`string Name`)
+
+
+- **setBrokerUrl** (`string Url`)
+
+	> Sets the broker URL: vm://name for an embedded broker, tcp://host:61616 or failover:(...) for a remote one.
+
+	- **@p** `Url` is a string with the broker URL.
+	- **@r** `this` object
+
+
+- **setUser** (`string User, string Password = null`)
+
+	> Sets credentials.
+
+	- **@p** `User` is a string with the user name.
+	- **@p** `Password` is a string with the password (optional).
+	- **@r** `this` object
+
+
+- **setQueue** (`string Name`)
+
+	> Consumes from a queue. Set exactly one of setQueue / setTopic.
+
+	- **@p** `Name` is a string with the queue name.
+	- **@r** `this` object
+
+
+- **setTopic** (`string Name`)
+
+	> Consumes from a topic. Set exactly one of setQueue / setTopic.
+
+	- **@p** `Name` is a string with the topic name.
+	- **@r** `this` object
+
+
+- **setSelector** (`string Selector`)
+
+	> Filters messages with a JMS selector.
+
+	- **@p** `Selector` is a string with the selector expression.
+	- **@r** `this` object
+
+
+- **setAckMode** (`string Mode`)
+
+	> Sets the acknowledge mode.
+
+	- **@p** `Mode` is a string with auto (default), client, dups_ok, individual, or transacted.
+	- **@r** `this` object
+
+
+- **setDurableSubscription** (`string ClientId, string SubName`)
+
+	> Makes the topic subscription durable, so messages published while this listener is down wait for it.
+
+	- **@p** `ClientId` is a string with the JMS client ID.
+	- **@p** `SubName` is a string with the subscription name.
+	- **@r** `this` object
+
+
+- **setPrefetch** (`int Count`)
+
+	> Sets the consumer prefetch count.
+
+	- **@p** `Count` is an int with the prefetch count.
+	- **@r** `this` object
+
+
+- **setPollTimeoutMs** (`int Ms`)
+
+	> Sets the receive-loop wakeup interval. Default 1000.
+
+	- **@p** `Ms` is an int with the poll timeout in milliseconds.
+	- **@r** `this` object
+
+
+- **setRedeliverOnError** (`bool On`)
+
+	> Controls handler-error behavior. True (the default for client/individual/transacted modes) makes the broker redeliver the message; false acknowledges it anyway.
+
+	- **@p** `On` is a bool with true to redeliver on handler errors.
+	- **@r** `this` object
+
+
+- **setOnMessage** (`callback Cb`)
+
+	> Sets the message handler, called on the listener thread with one ActiveMqMessage argument.
+
+	- **@p** `Cb` is a callback taking (object Msg).
+	- **@r** `this` object
+
+
+- **setOnError** (`callback Cb`)
+
+	> Sets an optional error handler, called with the error text when the message handler throws.
+
+	- **@p** `Cb` is a callback taking (string ErrText).
+	- **@r** `this` object
+
+
+- **getListenerName** ()
+
+	> Gets the listener name.
+
+	- **@r** `A` string with the listener name.
+
+
+- **getIsRunning** ()
+
+	> Reports whether the receive loop is running.
+
+	- **@r** `A` bool with true while running.
+
+
+- **startListener** ()
+
+	> Runs the receive loop on the calling thread, blocking until stopListener() is called. Under Aussom Server the runtime calls this itself after app.registerListener() - apps only call it directly for plain-CLI use (typically on a Thread).
+
+	- **@r** `this` object
+
+
+- **stopListener** ()
+
+	> Signals the receive loop to exit. Safe to call from any thread, any number of times.
+
+	- **@r** `this` object
+
+
+- **pauseListener** ()
+
+	> Pauses message delivery without dropping the connection.
+
+	- **@r** `this` object
+
+
+- **resumeListener** ()
+
+	> Resumes message delivery after pauseListener().
+
+	- **@r** `this` object
+
+
+
+
